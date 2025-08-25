@@ -444,7 +444,7 @@ class ExperimentRunner:
 def main():
     """主函数"""
     # 配置文件路径
-    config_path = "../config/experiment_config.yaml"
+    config_path = "config/experiment_config.yaml"
 
     # 创建实验运行器
     runner = ExperimentRunner(config_path)
