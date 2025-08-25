@@ -1,0 +1,141 @@
+# 实验配置文件
+experiment:
+  name: "UAV_Coverage_Optimization"
+  duration: 1200  # 20分钟仿真，2400步
+  random_seeds: [42, 123, 456, 789, 101, 202, 303, 404, 505, 606]
+  
+# 工作域设置
+workspace:
+  domain: [0, 1000, 0, 1000]  # [x_min, x_max, y_min, y_max]
+  grid_size: [30, 30]  # 30x30网格
+  visit_radius: 15  # 访问判定半径
+  
+# 环境密度分布
+environment:
+  density_types:
+    uniform:
+      type: "uniform"
+      value: 1.0
+    clustered:
+      type: "gaussian_mixture"
+      centers: [[200, 200], [500, 800], [800, 300]]
+      stds: [100, 80, 120]
+      weights: [0.4, 0.35, 0.25]
+    corridor:
+      type: "corridor"
+      start: [100, 400]
+      end: [900, 600]
+      width: 80
+      density: 2.5
+  
+# AoI阈值设置
+aoi_thresholds:
+  base: 60
+  hotspot: 30
+  corridor: 45
+  
+# UAV设置
+uav:
+  count: [6, 10, 15]  # 不同规模的机队
+  sampling_period: 0.5
+  max_velocity: 8.0
+  max_acceleration: 4.0
+  sensing_radii: [12, 15, 18]  # 异构传感半径
+  site_weights: [0, 1, 2]  # 站点权重
+  communication_radius: 180
+  packet_loss_rate: 0.1
+  communication_delay: [1, 2]
+  
+# 干扰设置
+disturbance:
+  none:
+    type: "none"
+    magnitude: 0.0
+  bounded:
+    max_magnitude: 0.4
+    direction_drift: 0.1
+  sub_gaussian:
+    sigma: 0.25
+    mean: 0.0
+  
+# 障碍设置
+obstacles:
+  static:
+    count: [8, 12]
+    types: ["circle", "rectangle"]
+    safety_distance: 3.0
+  dynamic:
+    count: [2, 3]
+    velocity: 1.5
+    safety_distance: 5.0
+  
+# RHC参数
+rhc:
+  horizon: 20
+  terminal_set_epsilon: 0.1
+  coupling_decay: 0.1
+  cost_weights:
+    aoi: 1.0
+    control: 0.01
+    collision: 5.0
+    boundary: 1.0
+  
+# AoI收紧参数
+aoi_tightening:
+  delta: 0.05
+  sigma: 0.25
+  
+# 实验任务
+tasks:
+  T1:
+    name: "Uniform_Static"
+    density: "uniform"
+    uav_count: [6, 10]
+    disturbance: "none"
+    obstacles: "static"
+    communication: "normal"
+  
+  T2:
+    name: "Clustered_Hotspot"
+    density: "clustered"
+    uav_count: [10, 15]
+    disturbance: "bounded"
+    obstacles: "static"
+    communication: "normal"
+  
+  T3:
+    name: "Corridor_Narrow"
+    density: "corridor"
+    uav_count: [10]
+    disturbance: "bounded"
+    obstacles: "static"
+    communication: "normal"
+  
+  T4:
+    name: "Dynamic_Obstacles"
+    density: "clustered"
+    uav_count: [10, 15]
+    disturbance: ["bounded", "sub_gaussian"]
+    obstacles: "dynamic"
+    communication: "normal"
+  
+  T5:
+    name: "Communication_Unstable"
+    density: "uniform"
+    uav_count: [10]
+    disturbance: "bounded"
+    obstacles: "static"
+    communication: "unstable"
+  
+  T6:
+    name: "Heavy_Load"
+    density: "clustered"
+    uav_count: [15]
+    disturbance: "bounded"
+    obstacles: "static"
+    communication: "normal"
+    aoi_thresholds:
+      base: 30
+      hotspot: 15
+      corridor: 25
+
